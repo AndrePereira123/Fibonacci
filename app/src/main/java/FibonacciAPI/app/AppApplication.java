@@ -25,7 +25,12 @@ public class AppApplication {
             return "n must be greater than or equal to 0";
         }
 
-        return String.format("Result for fibonacci with n = '%d' is %d", n, fib(n));
+        try {
+            long value = fib(n);
+            return String.format("Result for fibonacci with n = '%d' is %d", n, value);
+        } catch (ArithmeticException ex) {
+            return "Result exceeds maximum 64-bit signed integer value (9,223,372,036,854,775,807)";
+        }
     }
 
     private long fib(int n) {
@@ -33,10 +38,14 @@ public class AppApplication {
             return n;
         }
 
-        long previous = 0;
-        long current = 1;
+        long previous = 0L;
+        long current = 1L;
 
         for (int i = 2; i <= n; i++) {
+            // check for overflow before addition
+            if (Long.MAX_VALUE - current < previous) {
+                throw new ArithmeticException("overflow");
+            }
             long next = previous + current;
             previous = current;
             current = next;
